@@ -1,12 +1,22 @@
-from aws_cdk import RemovalPolicy, Stack, aws_s3 as s3
+from aws_cdk import RemovalPolicy, Stack
+import aws_cdk as core
 from constructs import Construct
+from aws_cdk.aws_s3 import Bucket, BlockPublicAccess
+
 
 class CdkWithChatgptStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Create an Amazon S3 bucket
-        s3.Bucket(self, "MyBucket", versioned=True, removal_policy=RemovalPolicy.DESTROY)
+        my_account_id = core.Aws.ACCOUNT_ID
+        bucket_name = f"destination-{my_account_id}"
+
+        bucket = Bucket(self, "DestinationBucket",
+            bucket_name=bucket_name,
+            block_public_access=BlockPublicAccess.BLOCK_ALL,
+            removal_policy=RemovalPolicy.DESTROY,
+            versioned=True,
+        )
 
 
