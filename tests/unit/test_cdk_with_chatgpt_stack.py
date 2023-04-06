@@ -1,34 +1,21 @@
-import re
-import pytest
 import aws_cdk as core
-from aws_cdk.aws_s3 import Bucket
-from constructs import Construct
+import pytest
 
 from cdk_with_chatgpt.cdk_with_chatgpt_stack import CdkWithChatgptStack
 
 
-
-def get_stack() -> CdkWithChatgptStack:
+# This is a helper function to get the Bucket resource from the stack
+def get_bucket_resource_from_stack():
     app = core.App()
-    return CdkWithChatgptStack(app, "MyTestStack")
-
-
-def test_stack_has_bucket():
-    stack = get_stack()
-    assert stack.destination_bucket is not None, "Expected a Bucket in the stack"
-
-def test_bucket_name():
-    app = core.App()
-    stack = CdkWithChatgptStack(app, "MyTestStack")
+    CdkWithChatgptStack(app, "MyTestStack")
     template = app.synth().get_stack_by_name("MyTestStack").template
-
-    # Find the AWS::S3::Bucket resource in the template
-    bucket_resource = None
     for _, resource in template['Resources'].items():
         if resource['Type'] == 'AWS::S3::Bucket':
-            bucket_resource = resource
-            break
+            return resource
+    return None
 
+def test_bucket_name():
+    bucket_resource = get_bucket_resource_from_stack()
     assert bucket_resource is not None, "Expected a Bucket resource in the template"
 
     # Check the bucket name
@@ -36,19 +23,9 @@ def test_bucket_name():
     assert bucket_name_fn_join["Fn::Join"][1][0] == "destination-", \
         f"Expected bucket name to start with 'destination-', but got '{bucket_name_fn_join}'"
 
-
+# test for block public access settings, removal policy, and versioning
 def test_bucket_properties():
-    app = core.App()
-    stack = CdkWithChatgptStack(app, "MyTestStack")
-    template = app.synth().get_stack_by_name("MyTestStack").template
-
-    # Find the AWS::S3::Bucket resource in the template
-    bucket_resource = None
-    for _, resource in template['Resources'].items():
-        if resource['Type'] == 'AWS::S3::Bucket':
-            bucket_resource = resource
-            break
-
+    bucket_resource = get_bucket_resource_from_stack()
     assert bucket_resource is not None, "Expected a Bucket resource in the template"
 
     # Check block public access settings
