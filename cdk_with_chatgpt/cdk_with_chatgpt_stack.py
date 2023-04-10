@@ -2,11 +2,16 @@ from aws_cdk import RemovalPolicy, Stack
 import aws_cdk as core
 from constructs import Construct
 from aws_cdk.aws_s3 import Bucket, BlockPublicAccess
-
+from aws_cdk.aws_ecr import Repository
+from aws_cdk.aws_ecr_assets import DockerImageAsset
+from aws_cdk.aws_ecs import ContainerImage
 
 class CdkWithChatgptStack(Stack):
 
     destination_bucket: Bucket
+    ecr_repository: Repository
+    docker_image_asset: DockerImageAsset
+    container_image: ContainerImage
 
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
@@ -21,5 +26,13 @@ class CdkWithChatgptStack(Stack):
             removal_policy=RemovalPolicy.DESTROY,
             versioned=True,
         )
+
+        docker_directory = './docker'
+
+        self.ecr_repository = Repository(self, 'EcrRepository')
+
+        self.docker_image_asset = DockerImageAsset(self, 'DockerImage', directory=docker_directory,)
+
+        self.container_image = ContainerImage.from_asset(docker_directory)
 
 

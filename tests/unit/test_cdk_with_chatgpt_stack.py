@@ -5,10 +5,10 @@ from cdk_with_chatgpt.cdk_with_chatgpt_stack import CdkWithChatgptStack
 
 
 # This is a helper function to get the Bucket resource from the stack
-def get_bucket_resource_from_stack():
+def get_bucket_resource_from_stack(stack_name: str = "MyTestStack"):
     app = core.App()
-    CdkWithChatgptStack(app, "MyTestStack")
-    template = app.synth().get_stack_by_name("MyTestStack").template
+    CdkWithChatgptStack(app, stack_name)
+    template = app.synth().get_stack_by_name(stack_name).template
     for _, resource in template['Resources'].items():
         if resource['Type'] == 'AWS::S3::Bucket':
             return resource
