@@ -14,6 +14,7 @@ def get_bucket_resource_from_stack(stack_name: str = "MyTestStack"):
             return resource
     return None
 
+
 def test_bucket_name():
     bucket_resource = get_bucket_resource_from_stack()
     assert bucket_resource is not None, "Expected a Bucket resource in the template"
